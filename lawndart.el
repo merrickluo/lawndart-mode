@@ -42,6 +42,26 @@
 (require 'js)
 (require 'flycheck)
 
+(defcustom dart-sdk-path
+  ;; Use Platform.resolvedExecutable so that this logic works through symlinks
+  ;; and wrapper scripts.
+  (-when-let (dart (executable-find "dart"))
+    (dart--with-temp-file input
+      (with-temp-file input (insert "
+        import 'dart:io';
+        void main() {
+          print(Platform.resolvedExecutable);
+        }
+        "))
+      (-when-let (result (dart--try-process dart input))
+        (file-name-directory
+         (directory-file-name
+          (file-name-directory (string-trim result)))))))
+  "The absolute path to the root of the Dart SDK."
+  :group 'lawndart
+  :type 'directory
+  :package-version '(lawndart-mode . "1.0.0"))
+
 (flycheck-define-checker dart
   "A Dart syntax checker using the Dart tool dartanalyzer.
 
@@ -88,6 +108,19 @@ See URL `http://dartlang.org/'."
          (message) line-end)
    )
   :modes lawndart-mode)
+
+(defun flycheck-analyzer-executable-find (executable)
+  (message dart-sdk-path)
+  (if (file-exists-p dart-sdk-path)
+      (let ((executable-file (concat dart-sdk-path "/bin/" executable)))
+        (if (file-executable-p executable-file)
+            executable-file
+          nil))
+    (executable-find executable)))
+
+
+(defun flycheck-dart-analyzer-setup ()
+  (setq-local flycheck-executable-find #'flycheck-analyzer-executable-find))
 
 (add-to-list 'flycheck-checkers 'dart)
 
