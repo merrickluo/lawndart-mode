@@ -68,6 +68,17 @@
   :group 'lawndart
   :type 'bool)
 
+(defvar lawndart-mode-map (c-make-inherited-keymap)
+  "Keymap used in dart-mode buffers.")
+(define-key lawndart-mode-map (kbd "M-.") 'dart-goto)
+;; (define-key lawndart-mode-map (kbd "C-c C-f") 'dart-find-refs)
+;; (define-key lawndart-mode-map (kbd "C-c C-e") 'dart-find-member-decls)
+;; (define-key lawndart-mode-map (kbd "C-c C-r") 'dart-find-member-refs)
+;; (define-key lawndart-mode-map (kbd "C-c C-t") 'dart-find-top-level-decls)
+;; (define-key lawndart-mode-map (kbd "C-c C-o") 'dart-format)
+;; (define-key lawndart-mode-map (kbd "M-/") 'dart-expand)
+;; (define-key lawndart-mode-map (kbd "M-?") 'dart-expand-parameters)
+
 (defun dart-executable-path ()
   "The absolute path to the 'dart' executable.
 
